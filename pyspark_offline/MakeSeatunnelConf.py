@@ -4,7 +4,6 @@
 import argparse
 from datetime import datetime
 import pymysql
-from pandas.plotting import table
 from pymysql import Error
 import time
 
