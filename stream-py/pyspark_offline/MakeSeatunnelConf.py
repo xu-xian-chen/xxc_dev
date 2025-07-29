@@ -24,7 +24,6 @@ hdfs_nn = "hdfs://cdh01:8020"
 
 hive_metastore = "thrift://cdh01:9083"
 HDFS_FILE_PATH = f"/warehouse/{database}/ods/"
-
 #全量表集合
 SYNC_TYPE_MAP = {
     "a_template_city_distance": "full",
