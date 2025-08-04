@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>留言管理 - 管理员</title>
+  <style>
+    body { font-family: 'Helvetica Neue', sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    h1 { color: #0d47a1; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #eee; }
+    .reply { background: #f0f4ff; margin-left: 20px; }
+    button { background-color: #d32f2f; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #b71c1c; }
+    .status-0 { color: #999; text-decoration: line-through; }
+  </style>
+</head>
+<body>
+  <h1>留言管理（管理员）</h1>
+  <p><a href="{{ url_for('index') }}">返回主页</a></p>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>姓名</th>
+        <th>内容</th>
+        <th>时间</th>
+        <th>父留言ID</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for msg in messages %}
+      <tr class="status-{{ msg.status }}">
+        <td>{{ msg.id }}</td>
+        <td>{{ msg.name }}</td>
+        <td>{{ msg.message|e }}</td>
+        <td>{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ msg.parent_id if msg.parent_id else '-' }}</td>
+        <td>{{ '正常' if msg.status == 1 else '已删除' }}</td>
+        <td>
+          {% if msg.status == 1 %}
+          <button class="delete-btn" data-id="{{ msg.id }}">删除</button>
+          {% else %}
+          -
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <script>
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!confirm('确定删除该留言吗？删除后不可恢复。')) return;
+        const id = btn.getAttribute('data-id');
+        fetch('/admin/delete_message', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({id})
+        }).then(res => res.json()).then(data => {
+          if (data.success) {
+            alert('删除成功');
+            window.location.reload();
+          } else {
+            alert('删除失败: ' + data.message);
+          }
+        }).catch(() => {
+          alert('网络错误，删除失败');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>徐先琛的个人博客</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background-color: #0d47a1;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    nav {
+      background-color: #eeeeee;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #0d47a1;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    section {
+      background: white;
+      padding: 20px 24px;
+      margin-bottom: 40px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .post {
+      border-left: 4px solid #0d47a1;
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-radius: 4px;
+    }
+
+    /* 留言板样式 */
+    #comment-form input[type="text"],
+    #comment-form textarea {
+      width: calc(100% - 40px);
+      padding: 8px 20px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    #comment-form button {
+      background-color: #0d47a1;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #comment-form button:hover {
+      background-color: #083d8a;
+    }
+    .comment {
+      border-bottom: 1px solid #ddd;
+      padding: 12px 0;
+    }
+    .comment-reply {
+      background: #f0f4ff;
+      margin: 8px 0 8px 20px;
+      padding: 8px 12px;
+      border-radius: 3px;
+    }
+    .reply-btn {
+      background: none;
+      border: none;
+      color: #0d47a1;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 0;
+      margin-top: 4px;
+    }
+    .reply-btn:hover {
+      text-decoration: underline;
+    }
+    #cancel-reply {
+      background-color: #666;
+      margin-left: 10px;
+    }
+    footer {
+      background-color: #0d47a1;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+    @media (max-width: 600px) {
+      nav a {
+        display: block;
+        margin: 10px 0;
+      }
+      #comment-form input[type="text"],
+      #comment-form textarea {
+        width: calc(100% - 32px);
+        padding: 8px 16px;
+      }
+    }
+    .reply-box input[type="text"],
+    .reply-box textarea {
+      width: calc(100% - 40px);
+      padding: 8px 20px;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>徐先琛的个人博客</h1>
+    <p>记录成长 | 分享技术 | 留下痕迹</p>
+  </header>
+
+  <nav>
+    <a href="#about">关于我</a>
+    <a href="#blog">博客文章</a>
+    <a href="#comments">留言板</a>
+    <a href="#contact">联系我</a>
+  </nav>
+
+  <div class="container">
+    <section id="about">
+      <h2>👋 关于我</h2>
+      <p>你好，我是徐先琛，一名热爱编程与思考的技术从业者。喜欢探索系统架构、数据分析、自动化工具，也时常记录生活与所感所悟。</p>
+    </section>
+
+    <section id="blog">
+      <h2>📝 最新文章</h2>
+      <div class="post">
+        <h3>如何用 Python 构建数据分析流程</h3>
+        <p>本文将分享我在实际项目中如何通过 pandas 和 matplotlib 快速搭建数据处理与可视化框架。</p>
+        <small>发布日期：2025-08-01</small>
+      </div>
+      <div class="post">
+        <h3>我的 Linux 学习之路</h3>
+        <p>从最初的安装系统、配置环境，到熟练使用 shell、编写脚本，这是一段持续进步的旅程。</p>
+        <small>发布日期：2025-07-25</small>
+      </div>
+    </section>
+
+    <section id="comments">
+      <h2>💬 留言板</h2>
+      <form id="comment-form">
+        <input type="hidden" name="parent_id" id="parent_id" value="" />
+        <p><input type="text" name="name" placeholder="你的名字" required /></p>
+        <p><textarea name="message" rows="4" placeholder="写下你的留言" required></textarea></p>
+        <p>
+          <button type="submit">提交留言</button>
+          <button type="button" id="cancel-reply" style="display:none;">取消回复</button>
+        </p>
+        <div id="feedback"></div>
+      </form>
+
+      <div id="comment-list">
+        {% set show_limit = 3 %}
+        {% for msg in messages %}
+          {% if loop.index0 < show_limit %}
+            <div class="comment" data-id="{{ msg.id }}">
+              <p><strong>{{ msg.name }}</strong> 说：</p>
+              <p>{{ msg.message }}</p>
+              <p><small>{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</small></p>
+              <button class="reply-btn" data-id="{{ msg.id }}" data-name="{{ msg.name }}">回复</button>
+
+              <div class="reply-box" id="reply-box-{{ msg.id }}" style="display:none; margin-top:8px;">
+                <input type="text" class="reply-name" placeholder="你的名字" />
+                <textarea rows="3" placeholder="回复 {{ msg.name }}"></textarea>
+                <button class="send-reply-btn" data-parent-id="{{ msg.id }}">发送回复</button>
+                <button class="cancel-reply-btn" data-parent-id="{{ msg.id }}">取消</button>
+                <div class="reply-feedback"></div>
+              </div>
+
+              <div class="replies" style="margin-left:20px; margin-top:10px;">
+                {% for reply in messages %}
+                  {% if reply.parent_id == msg.id %}
+                  <div class="comment-reply" data-id="{{ reply.id }}">
+                    <p><strong>{{ reply.name }}</strong> 回复：</p>
+                    <p>{{ reply.message }}</p>
+                    <p><small>{{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}</small></p>
+                    <button class="reply-btn" data-id="{{ reply.id }}" data-name="{{ reply.name }}">回复</button>
+
+                    <div class="reply-box" id="reply-box-{{ reply.id }}" style="display:none; margin-top:8px;">
+                      <input type="text" class="reply-name" placeholder="你的名字" />
+                      <textarea rows="3" placeholder="回复 {{ reply.name }}"></textarea>
+                      <button class="send-reply-btn" data-parent-id="{{ reply.id }}">发送回复</button>
+                      <button class="cancel-reply-btn" data-parent-id="{{ reply.id }}">取消</button>
+                      <div class="reply-feedback"></div>
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            {% if loop.index0 == show_limit %}
+            <div id="folded-comments" style="display:none;">
+            {% endif %}
+            <div class="comment" data-id="{{ msg.id }}">
+              <p><strong>{{ msg.name }}</strong> 说：</p>
+              <p>{{ msg.message }}</p>
+              <p><small>{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</small></p>
+              <button class="reply-btn" data-id="{{ msg.id }}" data-name="{{ msg.name }}">回复</button>
+
+              <div class="reply-box" id="reply-box-{{ msg.id }}" style="display:none; margin-top:8px;">
+                <input type="text" class="reply-name" placeholder="你的名字" />
+                <textarea rows="3" placeholder="回复 {{ msg.name }}"></textarea>
+                <button class="send-reply-btn" data-parent-id="{{ msg.id }}">发送回复</button>
+                <button class="cancel-reply-btn" data-parent-id="{{ msg.id }}">取消</button>
+                <div class="reply-feedback"></div>
+              </div>
+
+              <div class="replies" style="margin-left:20px; margin-top:10px;">
+                {% for reply in messages %}
+                  {% if reply.parent_id == msg.id %}
+                  <div class="comment-reply" data-id="{{ reply.id }}">
+                    <p><strong>{{ reply.name }}</strong> 回复：</p>
+                    <p>{{ reply.message }}</p>
+                    <p><small>{{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}</small></p>
+                    <button class="reply-btn" data-id="{{ reply.id }}" data-name="{{ reply.name }}">回复</button>
+
+                    <div class="reply-box" id="reply-box-{{ reply.id }}" style="display:none; margin-top:8px;">
+                      <input type="text" class="reply-name" placeholder="你的名字" />
+                      <textarea rows="3" placeholder="回复 {{ reply.name }}"></textarea>
+                      <button class="send-reply-btn" data-parent-id="{{ reply.id }}">发送回复</button>
+                      <button class="cancel-reply-btn" data-parent-id="{{ reply.id }}">取消</button>
+                      <div class="reply-feedback"></div>
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            {% if loop.last %}
+            </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if messages|length > show_limit %}
+      <p style="text-align:center; margin-top:-30px;">
+        <button id="toggle-fold-btn" style="background:none; border:none; color:#0d47a1; cursor:pointer; font-weight:bold;">
+          展开更多留言 ▼
+        </button>
+      </p>
+      {% endif %}
+
+
+    </section>
+
+    <section id="contact">
+      <h2>📬 联系我</h2>
+      <p>邮箱：553169719@qq.com</p>
+      <p>GitHub：<a href="https://github.com/xu-xian-chen" target="_blank">xuxianchen</a></p>
+    </section>
+  </div>
+
+  <footer>
+    <p>© 2025 徐先琛 版权所有</p>
+    <p>备案号：蒙ICP备2025021794号</p>
+  </footer>
+
+  <script>
+    // 主留言表单提交
+    const commentForm = document.getElementById('comment-form');
+    const feedback = document.getElementById('feedback');
+    const cancelReplyBtn = document.getElementById('cancel-reply');
+
+    commentForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = commentForm.name.value.trim();
+      const message = commentForm.message.value.trim();
+      const parent_id = commentForm.parent_id.value || null;
+
+      if (!name) {
+        feedback.innerHTML = '<span style="color:red;">请输入你的名字</span>';
+        return;
+      }
+      if (!message) {
+        feedback.innerHTML = '<span style="color:red;">请输入留言内容</span>';
+        return;
+      }
+
+      feedback.innerHTML = '发送中...';
+
+      fetch('/add_message', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, message, parent_id})
+      }).then(res => res.json()).then(data => {
+        if (data.success) {
+          feedback.innerHTML = `<span style="color:green;">${parent_id ? '回复成功！' : '留言成功！'} 页面将在1秒刷新</span>`;
+          commentForm.reset();
+          commentForm.parent_id.value = '';
+          cancelReplyBtn.style.display = 'none';
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          feedback.innerHTML = `<span style="color:red;">${data.message}</span>`;
+        }
+      }).catch(() => {
+        feedback.innerHTML = '<span style="color:red;">网络错误，发送失败</span>';
+      });
+    });
+
+    cancelReplyBtn.addEventListener('click', () => {
+      commentForm.parent_id.value = '';
+      cancelReplyBtn.style.display = 'none';
+    });
+
+    // 回复按钮切换显示对应回复框
+    document.querySelectorAll('.reply-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parentId = btn.getAttribute('data-id');
+        const replyBox = document.getElementById('reply-box-' + parentId);
+        if (!replyBox) return;
+
+        // 关闭其它回复框
+        document.querySelectorAll('.reply-box').forEach(box => {
+          if (box !== replyBox) box.style.display = 'none';
+        });
+
+        replyBox.style.display = (replyBox.style.display === 'none' || replyBox.style.display === '') ? 'block' : 'none';
+        if (replyBox.style.display === 'block') {
+          commentForm.parent_id.value = parentId;
+          cancelReplyBtn.style.display = 'inline-block';
+          window.scrollTo({top: replyBox.offsetTop - 100, behavior: 'smooth'});
+        } else {
+          commentForm.parent_id.value = '';
+          cancelReplyBtn.style.display = 'none';
+        }
+      });
+    });
+
+    // 取消回复按钮
+    document.querySelectorAll('.cancel-reply-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parentId = btn.getAttribute('data-parent-id');
+        const replyBox = document.getElementById('reply-box-' + parentId);
+        if (!replyBox) return;
+        replyBox.style.display = 'none';
+        const nameInput = replyBox.querySelector('.reply-name');
+        const textarea = replyBox.querySelector('textarea');
+        const replyFeedback = replyBox.querySelector('.reply-feedback');
+        if (nameInput) nameInput.value = '';
+        if (textarea) textarea.value = '';
+        if (replyFeedback) replyFeedback.innerHTML = '';
+      });
+    });
+
+    // 发送回复按钮
+    document.querySelectorAll('.send-reply-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parentId = btn.getAttribute('data-parent-id');
+        const replyBox = document.getElementById('reply-box-' + parentId);
+        if (!replyBox) return;
+
+        const nameInput = replyBox.querySelector('.reply-name');
+        const textarea = replyBox.querySelector('textarea');
+        const feedback = replyBox.querySelector('.reply-feedback');
+
+        const name = nameInput.value.trim();
+        const message = textarea.value.trim();
+
+        if (!name) {
+          feedback.innerHTML = '<span style="color:red;">请输入你的名字</span>';
+          return;
+        }
+        if (!message) {
+          feedback.innerHTML = '<span style="color:red;">请输入回复内容</span>';
+          return;
+        }
+
+        feedback.innerHTML = '发送中...';
+
+        fetch('/add_message', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, message, parent_id: parentId})
+        }).then(res => res.json()).then(data => {
+          if (data.success) {
+            feedback.innerHTML = '<span style="color:green;">回复成功！页面将在1秒刷新</span>';
+            nameInput.value = '';
+            textarea.value = '';
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            feedback.innerHTML = `<span style="color:red;">${data.message}</span>`;
+          }
+        }).catch(() => {
+          feedback.innerHTML = '<span style="color:red;">网络错误，发送失败</span>';
+        });
+      });
+    });
+    const toggleBtn = document.getElementById('toggle-fold-btn');
+    const foldedComments = document.getElementById('folded-comments');
+
+    if (toggleBtn && foldedComments) {
+      toggleBtn.addEventListener('click', () => {
+        if (foldedComments.style.display === 'none') {
+          foldedComments.style.display = 'block';
+          toggleBtn.textContent = '收起留言 ▲';
+        } else {
+          foldedComments.style.display = 'none';
+          toggleBtn.textContent = '展开更多留言 ▼';
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>
