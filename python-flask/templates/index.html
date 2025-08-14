@@ -188,7 +188,7 @@
               <p><small>{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</small></p>
               <button class="reply-btn" data-id="{{ msg.id }}" data-name="{{ msg.name }}">回复</button>
 
-              <div class="reply-box" id="reply-box-{{ msg.id }}" style="display:none; margin-top:8px;">
+              <div class="reply-box" id="reply-box1-{{ msg.id }}" style="display:none; margin-top:8px;">
                 <input type="text" class="reply-name" placeholder="你的名字" />
                 <textarea rows="3" placeholder="回复 {{ msg.name }}"></textarea>
                 <button class="send-reply-btn" data-parent-id="{{ msg.id }}">发送回复</button>
@@ -205,7 +205,7 @@
                     <p><small>{{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}</small></p>
                     <button class="reply-btn" data-id="{{ reply.id }}" data-name="{{ reply.name }}">回复</button>
 
-                    <div class="reply-box" id="reply-box-{{ reply.id }}" style="display:none; margin-top:8px;">
+                    <div class="reply-box" id="reply-box2-{{ reply.id }}" style="display:none; margin-top:8px;">
                       <input type="text" class="reply-name" placeholder="你的名字" />
                       <textarea rows="3" placeholder="回复 {{ reply.name }}"></textarea>
                       <button class="send-reply-btn" data-parent-id="{{ reply.id }}">发送回复</button>
