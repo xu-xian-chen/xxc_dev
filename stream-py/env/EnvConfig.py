@@ -36,5 +36,5 @@ def check_process_config(file_path):
 
 
 if __name__ == '__main__':
-    # check_process_config(target_file_path)
-    clean_file_dev(target_file_path)
+    check_process_config(target_file_path)
+    # clean_file_dev(target_file_path)
