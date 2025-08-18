@@ -6,8 +6,8 @@ mysql.host=cdh01
 mysql.port=3306
 mysql.url=mysql.url=jdbc:mysql://cdh01:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
 mysql.timezone=Asia/Shanghai
-mysql.database=db1,db2,db3
-mysql.databases.conf=/path/to/databases.conf
+mysql.database=realtime_v1
+mysql.databases.conf=realtime_v1_config
 mysql.user=root
 mysql.pwd=123456
 mysql.spider.db=test
