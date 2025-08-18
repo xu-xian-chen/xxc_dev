@@ -16,7 +16,7 @@ import java.util.Properties;
 public class CdcSourceUtils {
 
     public static MySqlSource<String> getMySQLCdcSource(String database,String table,String username,String pwd,StartupOptions model){
-        return getMySQLCdcSource(database, table, username, pwd, model, "5403-5450");
+        return getMySQLCdcSource(database, table, username, pwd, model, "54100-54200");
     }
     
     public static MySqlSource<String> getMySQLCdcSource(String database,String table,String username,String pwd,StartupOptions model, String serverId){

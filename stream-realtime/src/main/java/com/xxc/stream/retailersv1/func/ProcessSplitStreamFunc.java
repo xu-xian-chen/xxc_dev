@@ -33,12 +33,10 @@ public class ProcessSplitStreamFunc extends ProcessFunction<JSONObject,String> {
             context.output(errTag, errJson.toJSONString());
             jsonObject.remove("err");
         }
-        //所有数据没有err
         JSONObject startJsonObj = jsonObject.getJSONObject("start");
         if (startJsonObj != null) {
             context.output(startTag, jsonObject.toJSONString());
         }else {
-            //start为空
             JSONObject commonJsonObj = jsonObject.getJSONObject("common");
             JSONObject pageJsonObj = jsonObject.getJSONObject("page");
             Long ts = jsonObject.getLong("ts");

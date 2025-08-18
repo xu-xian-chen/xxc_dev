@@ -35,7 +35,7 @@ kafka.start.log=realtime_start_log
 kafka.display.log=realtime_display_log
 kafka.action.log=realtime_action_log
 kafka.page.topic=realtime_page_log
-#kafka.cdc.db.topic=${kafka.cdc.db.topic}
+kafka.cdc.db.topic=realtime_base_data
 #kafka.db.fact.comment.topic=${kafka.db.fact.comment.topic}
 #kafka.result.sensitive.words.topic=${kafka.result.sensitive.words.topic}
 #kafka.result.label.base6.topic=${kafka.result.label.base6.topic}
@@ -54,7 +54,7 @@ kafka.page.topic=realtime_page_log
 zookeeper.server.host.list=cdh01:2181,cdh02:2181,cdh03:2181
 
 # Hbase
-#hbase.namespace=${hbase.namespace}
+hbase.namespace=realtime_v1
 
 # FLINK
 #flink.submit.user=${flink.submit.user}
