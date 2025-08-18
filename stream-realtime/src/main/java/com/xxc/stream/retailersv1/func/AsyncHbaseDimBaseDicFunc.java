@@ -89,8 +89,12 @@ public class AsyncHbaseDimBaseDicFunc extends RichAsyncFunction<JSONObject,JSONO
     @Override
     public void close() throws Exception {
         try {
-            if (dimTable != null) dimTable.close();
-            if (hbaseConn != null) hbaseConn.close();
+            if (dimTable != null) {
+                dimTable.close();
+            }
+            if (hbaseConn != null) {
+                hbaseConn.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
