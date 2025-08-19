@@ -47,6 +47,31 @@ public class HbaseUtils {
         return connection;
     }
 
+    // 建命名空间（不存在则创建）
+    public void createNamespaceIfAbsent(String namespace) throws IOException {
+        Admin admin = connection.getAdmin();
+        try {
+            admin.getNamespaceDescriptor(namespace); // 存在则不抛异常
+        } catch (org.apache.hadoop.hbase.NamespaceNotFoundException e) {
+            org.apache.hadoop.hbase.NamespaceDescriptor ns =
+                    org.apache.hadoop.hbase.NamespaceDescriptor.create(namespace).build();
+            admin.createNamespace(ns);
+        } finally {
+            admin.close();
+        }
+    }
+
+    // 正确带命名空间的存在性判断
+    public boolean tableIsExists(String namespace, String tableName) throws Exception {
+        Admin admin = connection.getAdmin();
+        try {
+            return admin.tableExists(TableName.valueOf(namespace, tableName));
+        } finally {
+            admin.close();
+        }
+    }
+
+
     public static void put(String rowKey, JSONObject value, BufferedMutator mutator) throws IOException {
         Put put = new Put(Bytes.toBytes(rowKey));
         for (Map.Entry<String, Object> entry : value.entrySet()) {
@@ -62,31 +87,34 @@ public class HbaseUtils {
         }
     }
 
-    public boolean createTable(String nameSpace,String tableName, String... columnFamily) throws Exception {
-        boolean b = tableIsExists(tableName);
-        if (b) {
+    public boolean createTable(String nameSpace, String tableName, String... columnFamily) throws Exception {
+        if (tableIsExists(nameSpace, tableName)) {
             return true;
         }
         Admin admin = connection.getAdmin();
-        TableDescriptorBuilder tableDescriptorBuilder = TableDescriptorBuilder.newBuilder(TableName.valueOf(nameSpace,tableName));
-        if (columnFamily.length > 0) {
-            for (String s : columnFamily) {
-                ColumnFamilyDescriptor build = ColumnFamilyDescriptorBuilder.newBuilder(s.getBytes()).setCompressionType(Compression.Algorithm.SNAPPY).build();
-                System.err.println("构建表列族：" + s);
-                tableDescriptorBuilder.setColumnFamily(build);
+        try {
+            TableDescriptorBuilder tdb =
+                    TableDescriptorBuilder.newBuilder(TableName.valueOf(nameSpace, tableName));
+            if (columnFamily.length > 0) {
+                for (String cf : columnFamily) {
+                    ColumnFamilyDescriptor cfd =
+                            ColumnFamilyDescriptorBuilder.newBuilder(cf.getBytes())
+                                    .setCompressionType(Compression.Algorithm.SNAPPY).build();
+                    tdb.setColumnFamily(cfd);
+                }
+            } else {
+                ColumnFamilyDescriptor cfd =
+                        ColumnFamilyDescriptorBuilder.newBuilder("info".getBytes())
+                                .setCompressionType(Compression.Algorithm.SNAPPY).build();
+                tdb.setColumnFamily(cfd);
             }
-        } else {
-            ColumnFamilyDescriptor build = ColumnFamilyDescriptorBuilder.newBuilder("info".getBytes()).setCompressionType(Compression.Algorithm.SNAPPY).build();
-            System.err.println("构建表列族：info");
-            tableDescriptorBuilder.setColumnFamily(build);
+            admin.createTable(tdb.build());
+            return tableIsExists(nameSpace, tableName);
+        } finally {
+            admin.close();
         }
-        TableDescriptor build = tableDescriptorBuilder
-                .build();
-        admin.createTable(build);
-        admin.close();
-        LOG.info("Create Table {}",tableName);
-        return tableIsExists(tableName);
     }
+
 
     public boolean tableIsExists(String tableName) throws Exception {
         Thread.sleep(1000);
@@ -212,7 +240,8 @@ public class HbaseUtils {
         HbaseUtils hbaseUtils = new HbaseUtils("cdh01,cdh02,cdh03");
 //        hbaseUtils.dropHbaseNameSpace("GMALL_FLINK_2207");
 //        System.err.println(hbaseUtils.tableIsExists("realtime_v2:dim_user_info"));
-        hbaseUtils.deleteTable("ns_zxn:dim_base_category1");
-//        hbaseUtils.getHbaseNameSpaceAllTablesList("realtime_v2");
+//        hbaseUtils.deleteTable("ns_zxn:dim_base_category1");
+//        hbaseUtils.getHbaseNameSpaceAllTablesList("realtime_v1");
+//        hbaseUtils.createNamespaceIfAbsent("realtime_v1");
     }
 }

@@ -33,10 +33,8 @@ import java.util.Map;
 public class ProcessSpiltStreamToHBaseDimFunc extends BroadcastProcessFunction<JSONObject,JSONObject,JSONObject> {
 
     private MapStateDescriptor<String,JSONObject> mapStateDescriptor;
-    private HashMap<String, TableProcessDim> configMap =  new HashMap<>();
-
+    private HashMap<String, TableProcessDim> configMap = new HashMap<>();
     private org.apache.hadoop.hbase.client.Connection hbaseConnection ;
-
     private HbaseUtils hbaseUtils;
 
 
@@ -77,7 +75,7 @@ public class ProcessSpiltStreamToHBaseDimFunc extends BroadcastProcessFunction<J
                 if (!jsonObject.getString("op").equals("d")){
                     JSONObject after = jsonObject.getJSONObject("after");
                     String sinkTableName = configMap.get(tableName).getSinkTable();
-                    sinkTableName = "realtime_v2:"+sinkTableName;
+                    sinkTableName = "realtime_v1:"+sinkTableName;
                     String hbaseRowKey = after.getString(configMap.get(tableName).getSinkRowKey());
                     Table hbaseConnectionTable = hbaseConnection.getTable(TableName.valueOf(sinkTableName));
                     Put put = new Put(Bytes.toBytes(MD5Hash.getMD5AsHex(hbaseRowKey.getBytes(StandardCharsets.UTF_8))));

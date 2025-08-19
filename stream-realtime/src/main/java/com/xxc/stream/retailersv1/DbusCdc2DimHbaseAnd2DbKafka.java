@@ -113,7 +113,8 @@ public class DbusCdc2DimHbaseAnd2DbKafka {
                  .name("map_create_hbase_dim_table");
 
         cdcDbDimStream.print("dim   ->");
-
+        tpDS.print("aa   ===>");
+//
         MapStateDescriptor<String, JSONObject> mapStageDesc = new MapStateDescriptor<>("mapStageDesc", String.class, JSONObject.class);
         BroadcastStream<JSONObject> broadcastDs = tpDS.broadcast(mapStageDesc);
         BroadcastConnectedStream<JSONObject, JSONObject> connectDs = cdcDbMainStreamMap.connect(broadcastDs);
