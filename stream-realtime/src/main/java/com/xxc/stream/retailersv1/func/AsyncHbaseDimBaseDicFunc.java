@@ -37,7 +37,7 @@ public class AsyncHbaseDimBaseDicFunc extends RichAsyncFunction<JSONObject,JSONO
     @Override
     public void open(Configuration parameters) throws Exception {
         hbaseConn = new HbaseUtils("cdh01:2181,cdh02:2181,cdh03:2181").getConnection();
-        dimTable = hbaseConn.getTable(TableName.valueOf("realtime_v2:dim_base_dic"));
+        dimTable = hbaseConn.getTable(TableName.valueOf("realtime_v1:dim_base_dic"));
         cache = CacheBuilder.newBuilder()
                 .maximumSize(1000)
                 .expireAfterWrite(10, TimeUnit.MINUTES)

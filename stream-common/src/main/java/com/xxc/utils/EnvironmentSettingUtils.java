@@ -3,6 +3,7 @@ package com.xxc.utils;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
 import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
+import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.runtime.state.storage.FileSystemCheckpointStorage;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
@@ -33,12 +34,12 @@ public final class EnvironmentSettingUtils {
         // 开启 checkpoint 支持在 STREAMING 模式下的 FlinkSink 操作
         env.enableCheckpointing(1000 * 30);
         // 设置状态后端为 RocksDB
-        env.setStateBackend(new EmbeddedRocksDBStateBackend());
+        env.setStateBackend(new HashMapStateBackend());
         CheckpointConfig config = env.getCheckpointConfig();
         // 设定语义模式，默认情况是 exactly_once
         config.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
         // 设置 checkpoint 存储路径
-        config.setCheckpointStorage(new FileSystemCheckpointStorage("hdfs://cdh01:8020/flink-point/ck"));
+        config.setCheckpointStorage(new FileSystemCheckpointStorage("file:///D:/flink_ckpt/dbus"));
         // 设置 checkpoint 超时时间，默认为10分钟
         config.setCheckpointTimeout(10 * 60 * 1000);
         // 设定两个 checkpoint 之间的最小时间间隔，防止出现例如状态数据过大导致 checkpoint 执行时间过长，从而导致 checkpoint 积压过多，
