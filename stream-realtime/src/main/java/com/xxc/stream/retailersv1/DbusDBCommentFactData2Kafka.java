@@ -174,7 +174,6 @@ public class DbusDBCommentFactData2Kafka {
                 .process(new IntervalJoinOrderCommentAndOrderInfoFunc())
                 .uid("interval_join_order_comment_and_order_info_func").name("interval_join_order_comment_and_order_info_func");
 
-
         SingleOutputStreamOperator<JSONObject> supplementDataMap = orderMsgAllDs.map(new RichMapFunction<JSONObject, JSONObject>() {
             @Override
             public JSONObject map(JSONObject jsonObject) {
@@ -182,7 +181,6 @@ public class DbusDBCommentFactData2Kafka {
                 return jsonObject;
             }
         }).uid("map-generate_comment").name("map-generate_comment");
-
 
 
         SingleOutputStreamOperator<JSONObject> suppleMapDs = supplementDataMap.map(new RichMapFunction<JSONObject, JSONObject>() {

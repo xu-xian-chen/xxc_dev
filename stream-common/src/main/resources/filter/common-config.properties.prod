@@ -64,7 +64,7 @@ hbase.namespace=realtime_v1
 #flink.checkpoint.minio.dir=${flink.checkpoint.minio.dir}
 
 # silicon_api_token
-#silicon.api.token=${silicon.api.token}
+silicon.api.token=sk-oaqepbujvahrxyunwwwhfveegjcctbuskjlaqbqyjyphnypy
 
 
 # Hive

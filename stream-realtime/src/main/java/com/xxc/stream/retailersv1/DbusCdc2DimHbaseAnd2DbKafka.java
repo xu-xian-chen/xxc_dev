@@ -82,7 +82,7 @@ public class DbusCdc2DimHbaseAnd2DbKafka {
                 .uid("mysql_cdc_to_kafka_topic")
                 .name("mysql_cdc_to_kafka_topic");
 
-        cdcDbMainStream.print("main  ->");
+//        cdcDbMainStream.print("main  ->");
 
         //配置表转换
         SingleOutputStreamOperator<JSONObject> cdcDbDimStreamMap = cdcDbDimStream.map(JSONObject::parseObject)
@@ -105,7 +105,7 @@ public class DbusCdc2DimHbaseAnd2DbKafka {
                 }).uid("clean_json_column_map")
                 .name("clean_json_column_map");
 
-        cdcDbDimStreamMapCleanColumn.print("cdcDbDimStreamMapCleanColumn ->");
+//        cdcDbDimStreamMapCleanColumn.print("cdcDbDimStreamMapCleanColumn ->");
 
         SingleOutputStreamOperator<JSONObject> tpDS = cdcDbDimStreamMapCleanColumn.map(
                 new MapUpdateHbaseDimTableFunc(CDH_ZOOKEEPER_SERVER, CDH_HBASE_NAME_SPACE)
@@ -114,7 +114,7 @@ public class DbusCdc2DimHbaseAnd2DbKafka {
 
         cdcDbDimStream.print("dim   ->");
         tpDS.print("aa   ===>");
-//
+
         MapStateDescriptor<String, JSONObject> mapStageDesc = new MapStateDescriptor<>("mapStageDesc", String.class, JSONObject.class);
         BroadcastStream<JSONObject> broadcastDs = tpDS.broadcast(mapStageDesc);
         BroadcastConnectedStream<JSONObject, JSONObject> connectDs = cdcDbMainStreamMap.connect(broadcastDs);
