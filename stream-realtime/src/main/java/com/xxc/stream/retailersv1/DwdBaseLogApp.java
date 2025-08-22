@@ -40,7 +40,7 @@ public class DwdBaseLogApp {
     private static final String T_DISPLAY = Optional.ofNullable(System.getProperty("kafka.dwd.display")).orElse("dwd_log_display");
     private static final String T_ACTION  = Optional.ofNullable(System.getProperty("kafka.dwd.action")).orElse("dwd_log_action");
     private static final String T_ERROR   = Optional.ofNullable(System.getProperty("kafka.dwd.error")).orElse("dwd_log_error");
-    // ===========================================
+    // ======================================
 
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
