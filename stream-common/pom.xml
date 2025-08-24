@@ -28,6 +28,21 @@
 
     <dependencies>
 
+
+        <!-- Flink JDBC Connector -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-jdbc</artifactId>   <!-- 1.14+ 无 Scala 后缀 -->
+            <version>1.16.3</version>
+        </dependency>
+
+        <!-- ClickHouse JDBC 驱动 -->
+        <dependency>
+            <groupId>ru.yandex.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.2.6</version> <!-- 兼容老版本 ClickHouse，必要时可用 0.3.2-patch 或 0.1.54 -->
+        </dependency>
+
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
