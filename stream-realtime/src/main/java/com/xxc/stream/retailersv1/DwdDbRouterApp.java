@@ -55,10 +55,8 @@ public class DwdDbRouterApp {
                 "kafka-ods-db"
         );
 
-        // Debezium JSON 归一（after/before 展平 + _table/op/event_time）
         SingleOutputStreamOperator<JSONObject> normalized = src.map(new DebeziumNormalizer());
 
-        // 按表路由 —— Sink 也用你封装的 KafkaSink<String>(servers, topic)
         normalized.filter(byTable("order_info"))
                 .map(stripMetaToString())
                 .sinkTo(KafkaUtils.buildKafkaSink(BOOTSTRAP, T_ORDER_INFO))
@@ -112,14 +110,18 @@ public class DwdDbRouterApp {
             JSONObject out = new JSONObject(true);
             try {
                 JSONObject root = JSON.parseObject(value);
-                if (root == null) return out;
+                if (root == null) {
+                    return out;
+                }
                 String op = root.getString("op");                  // c/u/d/r
                 JSONObject source = root.getJSONObject("source");
                 String table = source == null ? null : source.getString("table");
                 Long tsMs = root.getLong("ts_ms");
                 JSONObject payload = "d".equals(op) ? root.getJSONObject("before") : root.getJSONObject("after");
                 if (payload != null) {
-                    for (String k : payload.keySet()) out.put(k, payload.get(k));
+                    for (String k : payload.keySet()) {
+                        out.put(k, payload.get(k));
+                    }
                 }
                 out.put("_table", table);
                 out.put("op", "r".equals(op) ? "c" : op);

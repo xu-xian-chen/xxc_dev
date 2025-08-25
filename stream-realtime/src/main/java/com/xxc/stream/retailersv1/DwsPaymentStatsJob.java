@@ -59,18 +59,12 @@ public class DwsPaymentStatsJob {
         StreamExecutionEnvironment env = StreamContextEnvironment.getExecutionEnvironment();
         EnvironmentSettingUtils.defaultParameter(env);
 
-        final String BOOTSTRAP   = nvl(ConfigUtils.getString("kafka.bootstrap.servers"),
-                                       "cdh01:9092,cdh02:9092,cdh03:9092");
-        final String T_DWD_OD    = nvl(ConfigUtils.getString("kafka.dwd.trade.order_detail"),
-                                       "dwd_trade_order_detail");
-        final String T_DWD_PAY   = nvl(ConfigUtils.getString("kafka.dwd.trade.payment_info"),
-                                       "dwd_trade_payment_info");
-        final String T_DWS_PAY   = nvl(ConfigUtils.getString("kafka.dws.payment_stats"),
-                                       "dws_payment_stats");
-        final int WINDOW_MINUTES = Integer.parseInt(nvl(ConfigUtils.getString("dws.window.minutes"), "1"));
-
+        final String BOOTSTRAP   = ConfigUtils.getString("kafka.bootstrap.servers");
+        final String T_DWD_OD    = ConfigUtils.getString("kafka.dwd.trade.order_detail");
+        final String T_DWD_PAY   = ConfigUtils.getString("kafka.dwd.trade.payment_info");
+        final String T_DWS_PAY   = ConfigUtils.getString("kafka.dws.payment_stats");
+        final int WINDOW_MINUTES = Integer.parseInt(ConfigUtils.getString("dws.window.minutes"));
         ensureTopicExists(BOOTSTRAP, T_DWS_PAY, 3, (short)1);
-
         // 源：订单明细
         KafkaSource<String> odSource = KafkaUtils.buildKafkaSecureSource(
                 BOOTSTRAP, T_DWD_OD, new Date().toString(), OffsetsInitializer.earliest());
@@ -117,13 +111,20 @@ public class DwsPaymentStatsJob {
     static class PayAgg implements AggregateFunction<JSONObject, PayAcc, PayAcc> {
         @Override public PayAcc createAccumulator() { return new PayAcc(); }
         @Override public PayAcc add(JSONObject j, PayAcc a) {
-            a.payCt += 1; a.payAmount += j.getDoubleValue("payment_amount");
-            String uid = j.getString("user_id"); if (uid != null) a.userSet.add(uid);
+            a.payCt += 1;
+            a.payAmount += j.getDoubleValue("payment_amount");
+            String uid = j.getString("user_id");
+            if (uid != null) {
+                a.userSet.add(uid);
+            }
             return a;
         }
         @Override public PayAcc getResult(PayAcc a) { return a; }
         @Override public PayAcc merge(PayAcc a, PayAcc b) {
-            a.payCt += b.payCt; a.payAmount += b.payAmount; a.userSet.addAll(b.userSet); return a;
+            a.payCt += b.payCt;
+            a.payAmount += b.payAmount;
+            a.userSet.addAll(b.userSet);
+            return a;
         }
     }
     static class PayWindowOut extends ProcessWindowFunction<PayAcc, String, String, TimeWindow> {

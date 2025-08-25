@@ -35,7 +35,6 @@ public class AdsTradeSkuDailyJob {
         catch (Throwable t) { return d; }
     }
 
-    // ---- 模型 ----
     public static class DailyAgg {
         public String dt; public String skuId;
         public long orderCt, orderUserCt, skuNum; public double orderAmount;
@@ -104,7 +103,9 @@ public class AdsTradeSkuDailyJob {
         }
         @Override public void processElement(DailyAgg in, Context ctx, Collector<JSONObject> out) throws Exception {
             DailyAgg cur = state.value();
-            if (cur == null) cur = new DailyAgg(in.dt, in.skuId);
+            if (cur == null) {
+                cur = new DailyAgg(in.dt, in.skuId);
+            }
             cur.add(in);
             state.update(cur);
             out.collect(cur.toJson());
@@ -120,7 +121,8 @@ public class AdsTradeSkuDailyJob {
         final String DWS_ORDER = cfg("kafka.dws.order_stats","dws_order_stats");
         final String DWS_PAY   = cfg("kafka.dws.payment_stats","dws_payment_stats");
         final String DWS_REF   = cfg("kafka.dws.refund_stats","dws_refund_stats"); // 可无
-        final String CH_SQL    = cfg("clickhouse.insert.ads_trade_sku_day",
+        final String CH_SQL    = cfg
+                ("clickhouse.insert.ads_trade_sku_day",
                 "INSERT INTO ads_trade_sku_day (dt,sku_id,order_ct,order_user_ct,sku_num,order_amount," +
                         "payment_ct,payment_user_ct,payment_amount,refund_ct,refund_user_ct,refund_amount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
         final int TTL_DAYS     = Integer.parseInt(cfg("ads.state.ttl.days","3"));

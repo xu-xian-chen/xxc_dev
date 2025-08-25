@@ -61,8 +61,8 @@ public class ClickHouseUtils {
 
     /** 构建 Flink JDBC 批量执行配置 */
     public static JdbcExecutionOptions buildExecOptions() {
-        int batchSize   = Integer.parseInt(cfg("clickhouse.batch.size", "1000"));
-        int batchMs     = Integer.parseInt(cfg("clickhouse.batch.interval.ms", "2000"));
+        int batchSize   = Integer.parseInt(cfg("clickhouse.batch.size", "50"));
+        int batchMs     = Integer.parseInt(cfg("clickhouse.batch.interval.ms", "1000"));
         int maxRetries  = Integer.parseInt(cfg("clickhouse.max.retries", "3"));
         return JdbcExecutionOptions.builder()
                 .withBatchSize(batchSize)
