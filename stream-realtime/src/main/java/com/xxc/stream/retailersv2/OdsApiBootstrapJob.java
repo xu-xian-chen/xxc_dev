@@ -19,7 +19,8 @@ import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import java.nio.charset.StandardCharsets;
-
+import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
+import org.apache.flink.connector.kafka.sink.TopicSelector;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -120,24 +121,17 @@ public class OdsApiBootstrapJob {
     // 动态 Kafka Sink：在 serialize() 里决定 topic（兼容没有 TopicSelector 的版本）
     private static KafkaSink<String> buildDynamicKafkaSink(
             String bootstrap,
-            java.util.function.Function<String, String> topicSelector
+            TopicSelector<String> topicSelector
     ) {
         return KafkaSink.<String>builder()
                 .setBootstrapServers(bootstrap)
                 .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
-                .setRecordSerializer(new KafkaRecordSerializationSchema<String>() {
-                    @Override
-                    public ProducerRecord<byte[], byte[]> serialize(
-                            String element,
-                            KafkaRecordSerializationSchema.KafkaSinkContext ctx,
-                            Long timestamp
-                    ) {
-                        String topic = topicSelector.apply(element);
-                        byte[] value = (element == null) ? null : element.getBytes(StandardCharsets.UTF_8);
-                        // 如需主键做 key，可在这里计算并放到第一个参数
-                        return new ProducerRecord<>(topic, null, value);
-                    }
-                })
+                .setRecordSerializer(
+                        KafkaRecordSerializationSchema.<String>builder()
+                                .setTopicSelector(topicSelector)
+                                .setValueSerializationSchema(new SimpleStringSchema())
+                                .build()
+                )
                 .build();
     }
 
