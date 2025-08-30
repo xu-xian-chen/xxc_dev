@@ -237,11 +237,11 @@ public class HbaseUtils {
     @SneakyThrows
     public static void main(String[] args) {
         System.setProperty("HADOOP_USER_NAME","root");
-        HbaseUtils hbaseUtils = new HbaseUtils("cdh01,cdh02,cdh03");
+        HbaseUtils hbaseUtils = new HbaseUtils("cdh01:2181,cdh02:2181,cdh03:2181");
 //        hbaseUtils.dropHbaseNameSpace("GMALL_FLINK_2207");
 //        System.err.println(hbaseUtils.tableIsExists("realtime_v2:dim_user_info"));
 //        hbaseUtils.deleteTable("ns_zxn:dim_base_category1");
-//        hbaseUtils.getHbaseNameSpaceAllTablesList("realtime_v1");
-//        hbaseUtils.createNamespaceIfAbsent("realtime_v1");
+//        hbaseUtils.getHbaseNameSpaceAllTablesList("retailersv2");
+//        hbaseUtils.createNamespaceIfAbsent("retailersv2");
     }
 }
